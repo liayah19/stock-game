@@ -348,3 +348,81 @@ body {
     padding: 40px;
     color: var(--text-secondary);
 }
+
+/* Intro Overlay */
+.intro-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    z-index: 5000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.intro-content {
+    max-width: 400px;
+    width: 100%;
+}
+
+.logo-container.large {
+    margin-bottom: 40px;
+}
+
+.logo-container.large .logo-text-sub {
+    font-size: 20px;
+}
+
+.logo-container.large .logo-text-main {
+    font-size: 32px;
+}
+
+.intro-desc {
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.nickname-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#nickname-input {
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 18px;
+    text-align: center;
+    background: var(--gray-100);
+}
+
+.btn-start {
+    padding: 16px;
+    background: var(--toss-blue);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-nickname {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}

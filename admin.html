@@ -3,325 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>관리자 페이지 | 2026 경제 모의주식투자 게임</title>
+    <title>관리자 인증 | 2026 경제 모의주식투자 게임</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        /* 인증 화면 */
+        .auth-container { max-width: 400px; width: 100%; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; }
+        .logo-text-sub { font-size: 14px; font-weight: bold; color: #3182f6; display: block; margin-bottom: 4px; }
+        .logo-text-main { font-size: 22px; font-weight: 800; margin-bottom: 30px; }
+        h2 { font-size: 18px; margin-bottom: 20px; color: #191f28; }
+        input { width: 100%; padding: 16px; border: 1px solid #f2f4f6; border-radius: 12px; font-size: 16px; margin-bottom: 16px; background: #f9fafb; text-align: center; }
+        button { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-login { background: #3182f6; color: white; }
+        .btn-back { background: none; color: #4e5968; margin-top: 10px; font-size: 14px; }
 
-        body {
-            background: #f5f5f5;
-            padding: 20px;
-        }
-
-        .admin-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        h1 {
-            color: #191f28;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .admin-section {
-            margin-bottom: 30px;
-            padding-bottom: 30px;
-            border-bottom: 1px solid #f2f4f6;
-        }
-
-        .admin-section:last-child {
-            border-bottom: none;
-        }
-
-        h2 {
-            color: #3182f6;
-            font-size: 18px;
-            margin-bottom: 15px;
-        }
-
-        .control-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: #3182f6;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-
-        .btn-danger {
-            background: #f04452;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #e63946;
-        }
-
-        .btn-success {
-            background: #10b981;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-        }
-
-        .btn-secondary {
-            background: #e5e7eb;
-            color: #191f28;
-        }
-
-        .btn-secondary:hover {
-            background: #d1d5db;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .info-box {
-            background: #e8f3ff;
-            border-left: 4px solid #3182f6;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: #191f28;
-        }
-
-        .status-display {
-            background: #f9fafb;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .status-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .status-item:last-child {
-            border-bottom: none;
-        }
-
-        .label {
-            font-weight: 600;
-            color: #4e5968;
-        }
-
-        .value {
-            color: #191f28;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 13px;
-        }
-
-        th {
-            background: #f9fafb;
-            font-weight: 600;
-            color: #4e5968;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #3182f6;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-
-        .alert {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border-left: 4px solid #10b981;
-        }
-
-        .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border-left: 4px solid #f04452;
-        }
+        /* 관리자 도구 (초기 숨김) */
+        #admin-tools { display: none; width: 100%; max-width: 800px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .admin-section { margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #f2f4f6; }
+        .status-display { background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .status-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb; }
+        .control-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .btn-primary { background: #3182f6; color: white; }
+        .btn-danger { background: #f04452; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-secondary { background: #e5e7eb; color: #191f28; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
+        textarea { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; min-height: 80px; margin-bottom: 10px; }
+        .alert { padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; position: fixed; top: 20px; right: 20px; z-index: 10000; }
+        .alert-success { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
+        .alert-error { background: #fee2e2; color: #991b1b; border-left: 4px solid #f04452; }
     </style>
 </head>
 <body>
-    <div class="admin-container">
-        <a href="index.html" class="back-link">← 게임으로 돌아가기</a>
-        <h1>🎮 관리자 페이지</h1>
+    <!-- 인증 화면 -->
+    <div id="auth-screen" class="auth-container">
+        <span class="logo-text-sub">KSE ADMIN</span>
+        <h1 class="logo-text-main">Korea Stock Exchange</h1>
+        <h2>관리자 인증이 필요합니다</h2>
+        <input type="password" id="admin-password" placeholder="비밀번호를 입력하세요">
+        <button onclick="checkAdminPassword()" class="btn-login">인증하기</button>
+        <button onclick="location.href='index.html'" class="btn-back">게임으로 돌아가기</button>
+    </div>
 
-        <!-- 게임 상태 섹션 -->
+    <!-- 관리자 도구 -->
+    <div id="admin-tools">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h1>🎮 관리자 페이지</h1>
+            <button onclick="location.href='index.html'" class="btn-secondary" style="width: auto;">나가기</button>
+        </div>
+
         <div class="admin-section">
             <h2>게임 상태</h2>
             <div class="status-display">
-                <div class="status-item">
-                    <span class="label">현재 라운드:</span>
-                    <span class="value" id="current-round-display">1</span>
-                </div>
-                <div class="status-item">
-                    <span class="label">보유 현금:</span>
-                    <span class="value" id="balance-display">100,000,000원</span>
-                </div>
-                <div class="status-item">
-                    <span class="label">총 자산:</span>
-                    <span class="value" id="total-assets-display">100,000,000원</span>
-                </div>
-                <div class="status-item">
-                    <span class="label">수익률:</span>
-                    <span class="value" id="profit-rate-display">0.00%</span>
-                </div>
+                <div class="status-item"><span class="label">현재 라운드:</span> <span id="current-round-display">1</span></div>
+                <div class="status-item"><span class="label">보유 현금:</span> <span id="balance-display">0원</span></div>
+                <div class="status-item"><span class="label">총 자산:</span> <span id="total-assets-display">0원</span></div>
             </div>
         </div>
 
-        <!-- 라운드 제어 섹션 -->
         <div class="admin-section">
             <h2>라운드 제어</h2>
-            <div class="info-box">
-                현재 라운드를 강제로 진행하거나 특정 라운드로 이동할 수 있습니다.
-            </div>
             <div class="control-group">
                 <button class="btn-primary" onclick="adminNextRound()">다음 라운드로 진행</button>
                 <button class="btn-secondary" onclick="adminResetGame()">게임 초기화</button>
             </div>
-            <div class="control-group">
-                <select id="round-select" style="flex: 1;">
-                    <option value="">라운드 선택...</option>
-                    <option value="1">라운드 1</option>
-                    <option value="2">라운드 2</option>
-                    <option value="3">라운드 3</option>
-                    <option value="4">라운드 4</option>
-                    <option value="5">라운드 5</option>
-                </select>
-                <button class="btn-success" onclick="adminJumpToRound()">이동</button>
-            </div>
         </div>
 
-        <!-- 주식 가격 조정 섹션 -->
         <div class="admin-section">
             <h2>주식 가격 조정</h2>
-            <div class="info-box">
-                특정 기업의 주가를 수동으로 조정할 수 있습니다.
-            </div>
             <table>
-                <thead>
-                    <tr>
-                        <th>기업명</th>
-                        <th>현재가</th>
-                        <th>조정</th>
-                    </tr>
-                </thead>
-                <tbody id="stock-adjustment-table">
-                    <!-- 동적으로 생성됨 -->
-                </tbody>
+                <thead><tr><th>기업명</th><th>현재가</th><th>조정</th></tr></thead>
+                <tbody id="stock-adjustment-table"></tbody>
             </table>
         </div>
 
-        <!-- 자산 조정 섹션 -->
-        <div class="admin-section">
-            <h2>자산 조정</h2>
-            <div class="info-box">
-                플레이어의 현금을 직접 조정할 수 있습니다.
-            </div>
-            <div class="control-group">
-                <input type="number" id="balance-input" placeholder="조정할 금액 입력" style="flex: 1;">
-                <button class="btn-primary" onclick="adminSetBalance()">설정</button>
-            </div>
-        </div>
-
-        <!-- 뉴스 커스터마이징 섹션 -->
         <div class="admin-section">
             <h2>뉴스 커스터마이징</h2>
-            <div class="info-box">
-                현재 라운드의 뉴스를 변경할 수 있습니다.
-            </div>
             <textarea id="news-input" placeholder="새로운 뉴스 내용을 입력하세요..."></textarea>
             <button class="btn-primary" onclick="adminUpdateNews()">뉴스 업데이트</button>
         </div>
 
-        <!-- 랭킹 조회 섹션 -->
         <div class="admin-section">
             <h2>게임 랭킹</h2>
-            <div class="info-box">
-                모든 플레이어의 최종 자산 및 랭킹을 확인할 수 있습니다.
-            </div>
             <table>
-                <thead>
-                    <tr>
-                        <th>순위</th>
-                        <th>플레이어</th>
-                        <th>최종 자산</th>
-                        <th>수익률</th>
-                    </tr>
-                </thead>
-                <tbody id="ranking-table">
-                    <!-- 동적으로 생성됨 -->
-                </tbody>
+                <thead><tr><th>순위</th><th>플레이어</th><th>최종 자산</th></tr></thead>
+                <tbody id="ranking-table"></tbody>
             </table>
             <button class="btn-secondary" onclick="adminClearRanking()">랭킹 초기화</button>
         </div>
-
-        <!-- 알림 메시지 -->
-        <div id="alert-container"></div>
     </div>
+
+    <div id="alert-container"></div>
 
     <script src="data.js"></script>
     <script src="admin.js"></script>

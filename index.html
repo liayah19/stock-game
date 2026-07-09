@@ -5,19 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>2026 경제 모의주식투자 게임 | KSE</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Chart.js 라이브러리 추가 (차트 구현용) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div id="app">
+    <!-- 닉네임 입력 인트로 화면 -->
+    <div id="intro-overlay" class="intro-overlay">
+        <div class="intro-content">
+            <div class="logo-container large">
+                <span class="logo-text-sub">KSE</span>
+                <h1 class="logo-text-main">Korea Stock Exchange</h1>
+            </div>
+            <p class="intro-desc">2026 경제 모의주식투자 게임에 오신 것을 환영합니다.<br>플레이하실 닉네임을 입력해주세요.</p>
+            <div class="nickname-input-group">
+                <input type="text" id="nickname-input" placeholder="닉네임 입력 (최대 8자)" maxlength="8">
+                <button onclick="startGame()" class="btn-start">게임 시작하기</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app" style="display: none;">
         <!-- 상단 헤더 -->
         <header class="header">
             <div class="logo-container">
                 <span class="logo-text-sub">KSE</span>
                 <h1 class="logo-text-main">Korea Stock Exchange</h1>
             </div>
-            <div class="round-info">
-                <span id="current-round">ROUND 1</span>
+            <div class="header-right">
+                <span id="user-nickname" class="user-nickname"></span>
+                <div class="round-info">
+                    <span id="current-round">ROUND 1</span>
+                </div>
             </div>
         </header>
 
@@ -25,7 +42,7 @@
         <section class="news-ticker">
             <div class="ticker-label">📰 속보</div>
             <div class="ticker-content">
-                <p id="news-text">미국-이란 긴장 고조, 호르무즈 해협 봉쇄 위기...</p>
+                <p id="news-text">데이터를 불러오는 중...</p>
             </div>
         </section>
 
@@ -35,11 +52,11 @@
             <section class="asset-summary">
                 <div class="asset-item">
                     <span class="label">보유 현금</span>
-                    <span id="balance" class="value">100,000,000원</span>
+                    <span id="balance" class="value">0원</span>
                 </div>
                 <div class="asset-item highlight">
                     <span class="label">총 자산</span>
-                    <span id="total-assets" class="value">100,000,000원</span>
+                    <span id="total-assets" class="value">0원</span>
                 </div>
                 <div class="asset-item">
                     <span class="label">수익률</span>
@@ -51,13 +68,12 @@
             <section class="stock-list-container">
                 <h2 class="section-title">관심 종목</h2>
                 <div id="stock-list" class="stock-list">
-                    <!-- 스크립트에서 동적으로 생성될 예정입니다 -->
                     <div class="stock-item loading">데이터를 불러오는 중...</div>
                 </div>
             </section>
         </main>
 
-        <!-- 하단 탭 바 (모바일 대응 UI) -->
+        <!-- 하단 탭 바 -->
         <nav class="bottom-nav">
             <button class="nav-item active" onclick="showView('home')">홈</button>
             <button class="nav-item" onclick="showView('portfolio')">내 주식</button>
@@ -65,11 +81,11 @@
             <button class="nav-item" onclick="location.href='admin.html'">관리자</button>
         </nav>
 
-        <!-- 매수/매도 모달 (팝업) -->
+        <!-- 매수/매도 모달 -->
         <div id="trade-modal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 id="modal-stock-name">삼성전자</h3>
+                    <h3 id="modal-stock-name">주식명</h3>
                     <button class="close-btn" onclick="closeModal()">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -99,7 +115,6 @@
         </div>
     </div>
 
-    <!-- 데이터 및 로직 스크립트 -->
     <script src="data.js"></script>
     <script src="script.js"></script>
 </body>
