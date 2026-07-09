@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2026 경제 모의주식투자 게임 | KSE</title>
+    <title>2026 실시간 모의주식투자 게임 | KSE</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -12,14 +16,15 @@
     <div id="intro-overlay" class="intro-overlay">
         <div class="intro-content">
             <div class="logo-container large">
-                <span class="logo-text-sub">KSE</span>
+                <span class="logo-text-sub">KSE REALTIME</span>
                 <h1 class="logo-text-main">Korea Stock Exchange</h1>
             </div>
-            <p class="intro-desc">2026 경제 모의주식투자 게임에 오신 것을 환영합니다.<br>플레이하실 닉네임을 입력해주세요.</p>
+            <p class="intro-desc">관리자의 통제에 따라 실시간으로 진행되는<br>2026 경제 모의주식투자 게임입니다.</p>
             <div class="nickname-input-group">
                 <input type="text" id="nickname-input" placeholder="닉네임 입력 (최대 8자)" maxlength="8">
-                <button onclick="startGame()" class="btn-start">게임 시작하기</button>
+                <button onclick="startGame()" class="btn-start">게임 참가하기</button>
             </div>
+            <p id="connection-status" class="status-text">서버 연결 중...</p>
         </div>
     </div>
 
@@ -31,9 +36,9 @@
                 <h1 class="logo-text-main">Korea Stock Exchange</h1>
             </div>
             <div class="header-right">
-                <span id="user-nickname" class="user-nickname"></span>
+                <span id="user-nickname" class="user-nickname">닉네임</span>
                 <div class="round-info">
-                    <span id="current-round">ROUND 1</span>
+                    <span id="current-round">ROUND -</span>
                 </div>
             </div>
         </header>
@@ -42,7 +47,7 @@
         <section class="news-ticker">
             <div class="ticker-label">📰 속보</div>
             <div class="ticker-content">
-                <p id="news-text">데이터를 불러오는 중...</p>
+                <p id="news-text">관리자가 라운드를 시작할 때까지 기다려주세요...</p>
             </div>
         </section>
 
@@ -66,9 +71,12 @@
 
             <!-- 주식 리스트 섹션 -->
             <section class="stock-list-container">
-                <h2 class="section-title">관심 종목</h2>
+                <div class="section-header">
+                    <h2 class="section-title">관심 종목</h2>
+                    <span id="market-status" class="market-status">시장 열림</span>
+                </div>
                 <div id="stock-list" class="stock-list">
-                    <div class="stock-item loading">데이터를 불러오는 중...</div>
+                    <div class="stock-item loading">데이터 동기화 중...</div>
                 </div>
             </section>
         </main>
@@ -77,7 +85,7 @@
         <nav class="bottom-nav">
             <button class="nav-item active" onclick="showView('home')">홈</button>
             <button class="nav-item" onclick="showView('portfolio')">내 주식</button>
-            <button class="nav-item" onclick="showView('ranking')">랭킹</button>
+            <button class="nav-item" onclick="showView('ranking')">실시간 랭킹</button>
             <button class="nav-item" onclick="location.href='admin.html'">관리자</button>
         </nav>
 

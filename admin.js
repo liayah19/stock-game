@@ -1,185 +1,70 @@
-/* 관리자 페이지 로직 - 비밀번호 보안 강화 완성본 */
+/* 실시간 관리자 센터 로직 - 100% 완성본 */
 
 const ADMIN_PASSWORD = "kdh1304!";
+let serverStocks = [...initialData.stocks].map(s => ({ ...s, currentPrice: s.basePrice, changePercent: 0 }));
 
-let adminGameState = JSON.parse(localStorage.getItem('gameState')) || {
-    balance: initialData.balance,
-    currentRound: 1,
-    stocks: initialData.stocks.map(s => ({
-        ...s,
-        currentPrice: s.basePrice,
-        priceHistory: [s.basePrice],
-        changePercent: 0,
-        owned: 0
-    })),
-    totalAssets: initialData.balance,
-    history: []
-};
-
-let adminRanking = JSON.parse(localStorage.getItem('gameRanking')) || [];
-
-// 비밀번호 확인 함수
 function checkAdminPassword() {
-    const input = document.getElementById('admin-password');
-    if (input.value === ADMIN_PASSWORD) {
-        sessionStorage.setItem('isAdminAuthenticated', 'true');
-        showAdminTools();
-    } else {
-        alert('비밀번호가 틀렸습니다!');
-        input.value = '';
-    }
+    if (document.getElementById('admin-password').value === ADMIN_PASSWORD) {
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'block';
+        initAdmin();
+    } else alert('비밀번호 불일치');
 }
 
-// 관리자 도구 표시
-function showAdminTools() {
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('admin-tools').style.display = 'block';
-    document.body.style.alignItems = 'flex-start';
-    
-    updateAdminDisplay();
-    renderStockAdjustmentTable();
-    renderRankingTable();
-    loadNewsInput();
-}
+function initAdmin() {
+    // 실시간 로그 감시
+    db.ref('logs').limitToLast(50).on('child_added', (snapshot) => {
+        const log = snapshot.val();
+        const container = document.getElementById('trade-logs');
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.innerHTML = `[${log.timestamp}] ${log.nickname}: ${log.stockName} ${log.quantity}주 ${log.type} (${log.price}원)`;
+        container.prepend(entry);
+    });
 
-// 페이지 로드 시 인증 상태 확인
-document.addEventListener('DOMContentLoaded', () => {
-    if (sessionStorage.getItem('isAdminAuthenticated') === 'true') {
-        showAdminTools();
-    }
-});
-
-function updateAdminDisplay() {
-    document.getElementById('current-round-display').innerText = adminGameState.currentRound;
-    document.getElementById('balance-display').innerText = formatNumber(adminGameState.balance) + '원';
-    document.getElementById('total-assets-display').innerText = formatNumber(adminGameState.totalAssets) + '원';
-}
-
-function adminNextRound() {
-    if (adminGameState.currentRound < 5) {
-        adminGameState.currentRound++;
-        applyRoundChanges();
-        updateAdminDisplay();
-        saveGameState();
-        showAlert('다음 라운드로 진행했습니다.', 'success');
-    } else {
-        showAlert('이미 마지막 라운드입니다.', 'error');
-    }
-}
-
-function applyRoundChanges() {
-    const scenario = initialData.scenarios.find(s => s.round === adminGameState.currentRound);
-    if (scenario) {
-        adminGameState.stocks.forEach(stock => {
-            const change = scenario.changes[stock.id] || 0;
-            const prevPrice = stock.currentPrice;
-            stock.currentPrice = Math.floor(prevPrice * (1 + change / 100));
-            stock.changePercent = change;
-            stock.priceHistory.push(stock.currentPrice);
+    // 실시간 참가자 감시
+    db.ref('users').on('value', (snapshot) => {
+        const container = document.getElementById('user-list');
+        container.innerHTML = '';
+        snapshot.forEach(child => {
+            const user = child.val();
+            const row = document.createElement('div');
+            row.className = 'user-row';
+            row.innerHTML = `<span>${user.nickname}</span> <strong>${user.totalAssets.toLocaleString()}원</strong>`;
+            container.appendChild(row);
         });
-        calculateTotalAssets();
-    }
+    });
+
+    renderStockAdmin();
 }
 
-function adminResetGame() {
-    if (confirm('게임을 초기화하시겠습니까?')) {
-        adminGameState = {
-            balance: initialData.balance,
-            currentRound: 1,
-            stocks: initialData.stocks.map(s => ({
-                ...s,
-                currentPrice: s.basePrice,
-                priceHistory: [s.basePrice],
-                changePercent: 0,
-                owned: 0
-            })),
-            totalAssets: initialData.balance,
-            history: []
-        };
-        saveGameState();
-        location.reload();
-    }
-}
-
-function renderStockAdjustmentTable() {
-    const tableBody = document.getElementById('stock-adjustment-table');
-    tableBody.innerHTML = '';
-    adminGameState.stocks.forEach(stock => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${stock.name}</td>
-            <td>${formatNumber(stock.currentPrice)}원</td>
-            <td>
-                <div style="display: flex; gap: 5px;">
-                    <input type="number" id="price-${stock.id}" placeholder="새 가격" style="padding: 5px; margin: 0; font-size: 12px;">
-                    <button class="btn-primary" onclick="adminSetStockPrice(${stock.id})" style="padding: 5px 10px; width: auto; font-size: 12px;">설정</button>
-                </div>
-            </td>
+function renderStockAdmin() {
+    const tbody = document.getElementById('stock-admin-list');
+    tbody.innerHTML = '';
+    serverStocks.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="padding: 10px;"><input type="text" value="${s.name}" onchange="updateStockName(${s.id}, this.value)" class="input-mini" style="width: 120px;"></td>
+            <td><input type="number" value="${s.currentPrice}" onchange="updateStockPrice(${s.id}, this.value)" class="input-mini">원</td>
+            <td><input type="number" value="${s.changePercent}" onchange="updateStockChange(${s.id}, this.value)" class="input-mini">%</td>
+            <td><button onclick="syncServerState()" class="btn-primary" style="padding: 5px 10px; font-size: 12px;">즉시 반영</button></td>
         `;
-        tableBody.appendChild(row);
+        tbody.appendChild(tr);
     });
 }
 
-function adminSetStockPrice(stockId) {
-    const input = document.getElementById(`price-${stockId}`);
-    const newPrice = parseInt(input.value);
-    if (isNaN(newPrice) || newPrice <= 0) return;
+function updateStockName(id, val) { serverStocks.find(s => s.id === id).name = val; }
+function updateStockPrice(id, val) { serverStocks.find(s => s.id === id).currentPrice = parseInt(val); }
+function updateStockChange(id, val) { serverStocks.find(s => s.id === id).changePercent = parseFloat(val); }
+
+function syncServerState() {
+    const round = parseInt(document.getElementById('round-select').value);
+    const news = document.getElementById('news-input').value || initialData.scenarios.find(s => s.round === round).news;
     
-    const stock = adminGameState.stocks.find(s => s.id === stockId);
-    stock.currentPrice = newPrice;
-    stock.priceHistory.push(newPrice);
-    calculateTotalAssets();
-    saveGameState();
-    renderStockAdjustmentTable();
-    showAlert(`${stock.name} 가격 수정 완료`, 'success');
-}
-
-function loadNewsInput() {
-    const scenario = initialData.scenarios.find(s => s.round === adminGameState.currentRound);
-    if (scenario) document.getElementById('news-input').value = scenario.news;
-}
-
-function adminUpdateNews() {
-    const newNews = document.getElementById('news-input').value.trim();
-    if (!newNews) return;
-    const scenario = initialData.scenarios.find(s => s.round === adminGameState.currentRound);
-    if (scenario) scenario.news = newNews;
-    showAlert('뉴스 업데이트 완료', 'success');
-}
-
-function renderRankingTable() {
-    const tableBody = document.getElementById('ranking-table');
-    tableBody.innerHTML = '';
-    const sortedRanking = [...adminRanking].sort((a, b) => b.finalAssets - a.finalAssets);
-    sortedRanking.forEach((entry, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${index + 1}</td><td>${entry.playerName}</td><td>${formatNumber(entry.finalAssets)}원</td>`;
-        tableBody.appendChild(row);
-    });
-}
-
-function adminClearRanking() {
-    if (confirm('랭킹을 초기화하시겠습니까?')) {
-        adminRanking = [];
-        localStorage.setItem('gameRanking', JSON.stringify(adminRanking));
-        renderRankingTable();
-        showAlert('랭킹 초기화 완료', 'success');
-    }
-}
-
-function calculateTotalAssets() {
-    let stockValue = 0;
-    adminGameState.stocks.forEach(stock => { stockValue += stock.currentPrice * stock.owned; });
-    adminGameState.totalAssets = adminGameState.balance + stockValue;
-}
-
-function saveGameState() { localStorage.setItem('gameState', JSON.stringify(adminGameState)); }
-function formatNumber(num) { return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
-function showAlert(message, type) {
-    const container = document.getElementById('alert-container');
-    const div = document.createElement('div');
-    div.className = `alert alert-${type}`;
-    div.innerText = message;
-    container.appendChild(div);
-    setTimeout(() => div.remove(), 3000);
+    db.ref('gameState').set({
+        currentRound: round,
+        stocks: serverStocks,
+        news: news,
+        lastSync: Date.now()
+    }).then(() => alert('모든 클라이언트에 실시간 동기화되었습니다!'));
 }
