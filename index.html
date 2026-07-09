@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>전쟁과 주식 - 모의 투자 게임</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ===== 로딩 화면 ===== -->
+<div id="screen-loading" class="screen active">
+  <div class="loading-inner">
+    <div class="loading-logo">📈</div>
+    <h1>전쟁과 주식</h1>
+    <p class="subtitle">미국-이란 전쟁 시나리오 모의 투자 게임</p>
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<!-- ===== 이름 입력 화면 ===== -->
+<div id="screen-name" class="screen">
+  <div class="card name-card">
+    <div class="card-icon">🎯</div>
+    <h2>플레이어 등록</h2>
+    <p class="desc">게임에 참여할 이름을 입력하세요.<br/>초기 자본금은 <strong>₩1,000,000</strong>입니다.</p>
+    <div class="input-group">
+      <input type="text" id="player-name-input" placeholder="이름을 입력하세요" maxlength="20" />
+    </div>
+    <button class="btn btn-primary" id="start-game-btn">게임 시작</button>
+    <button class="btn btn-ghost" id="goto-admin-btn">관리자 패널</button>
+  </div>
+</div>
+
+<!-- ===== 게임 화면 ===== -->
+<div id="screen-game" class="screen">
+  <header class="game-header">
+    <div class="header-left">
+      <span class="logo-text">📈 전쟁과 주식</span>
+    </div>
+    <div class="header-center">
+      <span id="round-badge" class="round-badge">라운드 1 / 5</span>
+    </div>
+    <div class="header-right">
+      <span id="player-display" class="player-name"></span>
+      <span id="cash-display" class="cash-display">₩1,000,000</span>
+    </div>
+  </header>
+
+  <div class="game-body">
+    <!-- 뉴스 배너 -->
+    <div class="news-banner" id="news-banner">
+      <span class="news-icon">📰</span>
+      <span id="news-text">뉴스를 불러오는 중...</span>
+    </div>
+
+    <!-- 대기 중 메시지 -->
+    <div id="waiting-msg" class="waiting-msg" style="display:none;">
+      <div class="waiting-inner">
+        <div class="wait-icon">⏳</div>
+        <h3>관리자가 라운드를 시작하기를 기다리는 중입니다...</h3>
+        <p>관리자가 다음 라운드를 시작하면 자동으로 업데이트됩니다.</p>
+      </div>
+    </div>
+
+    <!-- 주식 목록 -->
+    <div id="stock-grid" class="stock-grid"></div>
+
+    <!-- 포트폴리오 -->
+    <div class="portfolio-section">
+      <h3>📊 내 포트폴리오</h3>
+      <div id="portfolio-list" class="portfolio-list">
+        <p class="empty-msg">보유 주식이 없습니다.</p>
+      </div>
+    </div>
+
+    <!-- 라운드 완료 버튼 -->
+    <div class="round-action">
+      <button class="btn btn-success" id="next-round-btn">다음 라운드로 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 결과 화면 ===== -->
+<div id="screen-result" class="screen">
+  <div class="result-container">
+    <div class="result-trophy">🏆</div>
+    <h2>게임 종료!</h2>
+    <p id="result-player-name" class="result-name"></p>
+    <div class="result-stats">
+      <div class="stat-box">
+        <span class="stat-label">최종 자산</span>
+        <span class="stat-value" id="result-total"></span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">수익률</span>
+        <span class="stat-value" id="result-rate"></span>
+      </div>
+    </div>
+    <div id="result-portfolio" class="result-portfolio"></div>
+    <button class="btn btn-primary" id="restart-btn">다시 시작</button>
+  </div>
+</div>
+
+<!-- ===== 관리자 로그인 화면 ===== -->
+<div id="screen-admin-login" class="screen">
+  <div class="card admin-login-card">
+    <div class="card-icon">🔐</div>
+    <h2>관리자 로그인</h2>
+    <div class="input-group">
+      <input type="password" id="admin-pw-input" placeholder="비밀번호를 입력하세요" />
+    </div>
+    <p id="admin-pw-error" class="error-msg" style="display:none;">비밀번호가 올바르지 않습니다.</p>
+    <button class="btn btn-primary" id="admin-login-btn">로그인</button>
+    <button class="btn btn-ghost" id="admin-back-btn">← 돌아가기</button>
+  </div>
+</div>
+
+<!-- ===== 관리자 패널 화면 ===== -->
+<div id="screen-admin" class="screen">
+  <header class="admin-header">
+    <span class="logo-text">🔧 관리자 패널</span>
+    <div class="admin-header-right">
+      <span id="admin-round-display" class="round-badge">라운드 1 / 5</span>
+      <button class="btn btn-sm btn-danger" id="admin-logout-btn">로그아웃</button>
+    </div>
+  </header>
+
+  <div class="admin-body">
+    <!-- 탭 -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="tab-round">라운드 관리</button>
+      <button class="tab-btn" data-tab="tab-companies">기업 설정</button>
+      <button class="tab-btn" data-tab="tab-users">유저 거래 내역</button>
+    </div>
+
+    <!-- 라운드 관리 탭 -->
+    <div id="tab-round" class="tab-content active">
+      <div class="admin-card">
+        <h3>현재 라운드 상태</h3>
+        <p>현재 라운드: <strong id="admin-cur-round">1</strong> / 5</p>
+        <p>게임 상태: <strong id="admin-game-status">대기 중</strong></p>
+        <div class="round-btns">
+          <button class="btn btn-primary" id="admin-start-round-btn">라운드 시작</button>
+          <button class="btn btn-warning" id="admin-next-round-btn">다음 라운드로 이동</button>
+          <button class="btn btn-danger" id="admin-reset-game-btn">게임 초기화</button>
+        </div>
+      </div>
+      <div class="admin-card">
+        <h3>현재 라운드 뉴스</h3>
+        <textarea id="admin-news-edit" rows="4" class="admin-textarea"></textarea>
+        <button class="btn btn-primary btn-sm" id="admin-save-news-btn">뉴스 저장</button>
+      </div>
+    </div>
+
+    <!-- 기업 설정 탭 -->
+    <div id="tab-companies" class="tab-content">
+      <div class="admin-card">
+        <h3>기업 목록 및 설정</h3>
+        <div id="admin-company-list" class="admin-company-list"></div>
+      </div>
+    </div>
+
+    <!-- 유저 거래 내역 탭 -->
+    <div id="tab-users" class="tab-content">
+      <div class="admin-card">
+        <h3>유저 거래 내역</h3>
+        <div id="admin-user-list" class="admin-user-list">
+          <p class="empty-msg">아직 참여한 유저가 없습니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 거래 모달 ===== -->
+<div id="trade-modal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <h3 id="modal-title">주식 거래</h3>
+    <p id="modal-company-name" class="modal-company"></p>
+    <p>현재가: <strong id="modal-price"></strong></p>
+    <p>보유 현금: <strong id="modal-cash"></strong></p>
+    <p>보유 주식: <strong id="modal-held"></strong>주</p>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="modal-buy-tab" onclick="switchModalTab('buy')">매수</button>
+      <button class="modal-tab" id="modal-sell-tab" onclick="switchModalTab('sell')">매도</button>
+    </div>
+    <div class="input-group">
+      <input type="number" id="modal-qty" placeholder="수량 입력" min="1" />
+    </div>
+    <p id="modal-total-cost" class="modal-cost"></p>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="modal-confirm-btn">확인</button>
+      <button class="btn btn-ghost" id="modal-cancel-btn">취소</button>
+    </div>
+    <p id="modal-error" class="error-msg" style="display:none;"></p>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
